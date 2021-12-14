@@ -1,0 +1,19 @@
+{
+    "name": "diezit/coachview-connector",
+    "description": "Library to connect to the CoachView REST API",
+    "type": "library",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Diezit\\CoachviewConnector\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Robin van Schuilenburg",
+            "email": "robin@diezit.nl"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
