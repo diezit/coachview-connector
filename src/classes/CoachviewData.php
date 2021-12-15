@@ -1,8 +1,8 @@
 <?php
 
-namespace Diezit\Coachview\Service\Classes;
+namespace Diezit\CoachviewConnector\Classes;
 
-use Diezit\Coachview\Service\Coachview;
+use Diezit\CoachviewConnector\Coachview;
 
 class CoachviewData
 {
@@ -17,7 +17,7 @@ class CoachviewData
     public function makeParams($options)
     {
         foreach ($options as $key => $value) {
-            if($value == null || $value = '') {
+            if ($value == null || $value = '') {
                 unset($options[$key]);
             }
         }

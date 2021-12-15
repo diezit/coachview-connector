@@ -1,10 +1,8 @@
 <?php
 
-
-namespace Diezit\Coachview\Service\Classes;
+namespace Diezit\CoachviewConnector\Classes;
 
 use Illuminate\Support\Collection;
-use phpDocumentor\Reflection\Types\This;
 
 class Teacher extends CoachviewData
 {
@@ -20,7 +18,7 @@ class Teacher extends CoachviewData
 
     public function all($offset = null, $limit = null): Collection
     {
-        $params = $this->makeParams(['skip'=> $offset, 'take' => $limit]);
+        $params = $this->makeParams(['skip' => $offset, 'take' => $limit]);
         $data = $this->coachview->getData('/api/v1/Docenten', $params);
 
         $response = [];

@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Diezit\Coachview\Service\Classes;
-
+namespace Diezit\CoachviewConnector\Classes;
 
 class CourseComponentTeacher extends CoachviewData
 {
@@ -21,7 +19,9 @@ class CourseComponentTeacher extends CoachviewData
         $running = true;
 
         while ($running) {
-            $params = $this->makeParams(['where' => 'opleidingsonderdeelId=' . $courseComponentId, 'take' => $take, 'skip' => $skip]);
+            $params = $this->makeParams(
+                ['where' => 'opleidingsonderdeelId='.$courseComponentId, 'take' => $take, 'skip' => $skip]
+            );
             $data = $this->coachview->getData('/api/v1/Opleidingsonderdelen_Docenten', $params);
             foreach ($data as $coachViewCourseComponent) {
                 $response[] = $this->getCourseComponentTeacherFromCoachViewData($coachViewCourseComponent);

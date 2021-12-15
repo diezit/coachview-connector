@@ -1,6 +1,6 @@
 <?php
 
-namespace Diezit\Coachview\Service\Classes;
+namespace Diezit\CoachviewConnector\Classes;
 
 class TrainingRequest extends CoachviewData
 {
@@ -110,7 +110,8 @@ class TrainingRequest extends CoachviewData
     }
 
 
-    public function addParticipant(Person $person) {
+    public function addParticipant(Person $person)
+    {
         $this->participants[] = $person;
     }
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace Diezit\Coachview\Service\Classes;
+namespace Diezit\CoachviewConnector\Classes;
 
 use Carbon\Carbon;
-use Diezit\Coachview\Service\Coachview;
+use Diezit\CoachviewConnector\Coachview;
 use Illuminate\Support\Collection;
 
 class Course extends CoachviewData
@@ -12,18 +12,20 @@ class Course extends CoachviewData
     protected $name;
     protected $code;
     protected $status;
+    protected $planningStatus;
     protected $comments;
     protected $location;
     protected $contactPerson;
     protected $startDate;
     protected $endDate;
     protected $attendees;
+    protected $template;
     protected $maxAttendees;
     protected $study_credits;
 
     public function all($offset = null, $limit = null): Collection
     {
-        $params = $this->makeParams(['skip'=> $offset, 'take' => $limit]);
+        $params = $this->makeParams(['skip' => $offset, 'take' => $limit]);
         $data = $this->coachview->getData('/api/v1/Opleidingen', $params);
 
 
@@ -42,6 +44,7 @@ class Course extends CoachviewData
             ->setName($coachViewCourse->naam)
             ->setCode($coachViewCourse->code)
             ->setStatus($coachViewCourse->publicatie)
+            ->setPlanningStatus($coachViewCourse->publicatiePlanning)
             ->setComments($coachViewCourse->opmerking)
             ->setStartDate($coachViewCourse->startDatum)
             ->setEndDate($coachViewCourse->eindDatum)
@@ -50,6 +53,12 @@ class Course extends CoachviewData
 
         if ($coachViewCourse->startLocatie) {
             $course->setLocation($coachViewCourse->startLocatie->lokaal);
+        }
+
+        if ($coachViewCourse->opleidingssoortId) {
+            $template = (new CourseTemplate($this->coachview))
+                ->getCourseTemplateFromCoachViewData($coachViewCourse->opleidingssoort);
+            $course->setTemplate($template);
         }
 
         return $course;
@@ -112,6 +121,17 @@ class Course extends CoachviewData
     public function setStatus($status): self
     {
         $this->status = $status;
+        return $this;
+    }
+
+    public function getPlanningStatus()
+    {
+        return $this->planningStatus;
+    }
+
+    public function setPlanningStatus($planningStatus): self
+    {
+        $this->planningStatus = $planningStatus;
         return $this;
     }
 
@@ -203,9 +223,19 @@ class Course extends CoachviewData
         return $this;
     }
 
+    public function getTemplate(): ?CourseTemplate
+    {
+        return $this->template;
+    }
+
+    private function setTemplate(CourseTemplate $template)
+    {
+        $this->template = $template;
+    }
+
     public function getByCode(string $code): ?Course
     {
-        $params = $this->makeParams(['where'=> 'code='.$code]);
+        $params = $this->makeParams(['where' => 'code='.$code]);
         $data = $this->coachview->getData('/api/v1/Opleidingen', $params);
 
         foreach ($data as $coachViewCourse) {

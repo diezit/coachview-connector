@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Diezit\Coachview\Service\Classes;
+namespace Diezit\CoachviewConnector\Classes;
 
 
 class Address

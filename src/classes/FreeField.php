@@ -1,6 +1,6 @@
 <?php
 
-namespace Diezit\Coachview\Service\Classes;
+namespace Diezit\CoachviewConnector\Classes;
 
 class FreeField extends CoachviewData
 {
@@ -156,7 +156,6 @@ class FreeField extends CoachviewData
         $this->data = $data;
         return $this;
     }
-
 
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Diezit\Coachview\Service\Classes;
+namespace Diezit\CoachviewConnector\Classes;
 
 use Illuminate\Support\Collection;
 
@@ -21,12 +21,12 @@ class CourseComponentTemplate extends CoachviewData
 
     public function where($column, $value)
     {
-        $params = $this->makeParams(['where' => $column . '=' . $value]);
+        $params = $this->makeParams(['where' => $column.'='.$value]);
         return $this->coachview->getData('/api/v1/Opleidingssoortonderdelen', $params);
     }
 
-    public function getCourseComponentTemplateFromCoachViewData($coachViewCourseComponentTemplate): CourseComponentTemplate
-    {
+    public function getCourseComponentTemplateFromCoachViewData($coachViewCourseComponentTemplate
+    ): CourseComponentTemplate {
         return (new CourseComponentTemplate($this->coachview))
             ->setId($coachViewCourseComponentTemplate->id)
             ->setName($coachViewCourseComponentTemplate->naam)
@@ -220,10 +220,10 @@ class CourseComponentTemplate extends CoachviewData
      */
     public function getFreeFields(): array
     {
-        $params = $this->makeParams(['where' => 'recordId=' . $this->id]);
+        $params = $this->makeParams(['where' => 'recordId='.$this->id]);
         $coachViewData = $this->coachview->getData('/api/v1/Opleidingssoortonderdelen/Vrijevelden', $params);
         $freeFields = [];
-        foreach($coachViewData as $freeField) {
+        foreach ($coachViewData as $freeField) {
             $freeFields[] = (new FreeField($this->coachview))
                 ->setOrder($freeField->vrijveldDefinitie->volgorde)
                 ->setCode($freeField->vrijveldDefinitie->code)
