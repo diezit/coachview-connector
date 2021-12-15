@@ -1,6 +1,6 @@
 <?php
 
-namespace Diezit\Coachview\Service;
+namespace Diezit\CoachviewConnector;
 
 use Carbon\Carbon;
 use Diezit\Coachview\Service\Classes\Course;
