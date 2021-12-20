@@ -2,34 +2,43 @@
 
 namespace Diezit\CoachviewConnector;
 
-use Carbon\Carbon;
+use Cache;
 use Diezit\CoachviewConnector\Classes\Course;
 use Diezit\CoachviewConnector\Classes\CourseComponent;
 use Diezit\CoachviewConnector\Classes\CourseComponentTeacher;
 use Diezit\CoachviewConnector\Classes\Teacher;
 use Diezit\CoachviewConnector\Classes\TrainingRequest;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
 
 class Coachview
 {
+    const CACHE_KEY_ACCESS_TOKEN = 'coachview_access_token';
 
+    /** @var string */
     private $apiRoot;
+
+    /** @var string */
     private $clientId;
+
+    /** @var string */
     private $secret;
-    private $accessToken;
-    private $accessTokenExpiry;
+
+    /** @var string */
     private $soapApiKey;
 
-    public function __construct($apiRoot, $clientId, $secret, $soapApiKey)
+    /** @var Client */
+    private $client;
+
+    public function __construct(string $apiRoot, string $clientId, string $secret, string $soapApiKey)
     {
         $this->apiRoot = $apiRoot;
         $this->clientId = $clientId;
         $this->secret = $secret;
         $this->soapApiKey = $soapApiKey;
 
-        $this->client = new \GuzzleHttp\Client();
-
-        return $this;
+        $this->client = new Client();
     }
 
     public function getSoapApiKey(): string
@@ -37,19 +46,17 @@ class Coachview
         return $this->soapApiKey;
     }
 
-    public function getData($endpoint, $params = null): ?array
+    public function getData(string $endpoint, array $params = null): ?array
     {
         try {
-            $response = $this->client->request(
-                'GET',
-                $this->apiRoot.$endpoint,
-                [
-                    'query' => $params,
-                    'headers' => [
-                        'Authorization' => 'Bearer '.$this->getAccessToken()
-                    ]
-                ]
-            );
+            $response = $this->doRequest($endpoint, $params);
+            if (!$response) {
+                return null;
+            }
+            if ($response->getStatusCode() === 401) {
+                $this->refreshAccessToken();
+                $response = $this->doRequest($endpoint, $params);
+            }
             return json_decode((string)$response->getBody());
         } catch (RequestException $exception) {
             // @TODO: remove below Exception when going live. This is to make errors more verbose while testing.
@@ -58,11 +65,39 @@ class Coachview
         }
     }
 
+    public function doRequest(string $endpoint, array $params = null): ?ResponseInterface
+    {
+        try {
+                return $this->client->request(
+                    'GET',
+                    $this->apiRoot.$endpoint,
+                    [
+                        'query' => $params,
+                        'headers' => [
+                            'Authorization' => 'Bearer '.$this->getAccessToken()
+                        ]
+                    ]
+                );
+        } catch (RequestException $exception) {
+            // @TODO: remove below Exception when going live. This is to make errors more verbose while testing.
+            if (!app()->environment('production')) {
+                dd($exception);
+            }
+            return null;
+        }
+    }
+
     private function getAccessToken(): ?string
     {
-        if ($this->accessToken && $this->accessTokenExpiry > Carbon::now()) {
-            return $this->accessToken;
+        if (!Cache::has(self::CACHE_KEY_ACCESS_TOKEN)) {
+            $this->refreshAccessToken();
         }
+
+        return Cache::get(self::CACHE_KEY_ACCESS_TOKEN);
+    }
+
+    protected function refreshAccessToken(): void
+    {
         try {
             $tokenRequest = $this->client->request(
                 'POST',
@@ -91,10 +126,7 @@ class Coachview
         $tokenResponseBody = (string)$tokenRequest->getBody();
         $tokenData = json_decode($tokenResponseBody);
 
-        $this->accessToken = $tokenData->access_token;
-        $this->accessTokenExpiry = Carbon::now()->addSeconds($tokenData->expires_in);
-
-        return $this->accessToken;
+        Cache::put(self::CACHE_KEY_ACCESS_TOKEN, $tokenData->access_token, $tokenData->expires_in);
     }
 
     public function course(): Course
