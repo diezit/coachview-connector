@@ -79,6 +79,7 @@ class Coachview
                             'Opleidingsonderdelen_Docenten.Lezen',
                             'Opleidingssoortonderdelen.Lezen',
                             'Docenten.Lezen',
+                            'Webaanvragen.Schrijven'
                         ]),
                     ]
                 ]
