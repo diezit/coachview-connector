@@ -3,11 +3,11 @@
 namespace Diezit\CoachviewConnector;
 
 use Cache;
-use Diezit\CoachviewConnector\Classes\Course;
+use Diezit\CoachviewConnector\Classes\Opleiding;
 use Diezit\CoachviewConnector\Classes\CourseComponent;
 use Diezit\CoachviewConnector\Classes\CourseComponentTeacher;
 use Diezit\CoachviewConnector\Classes\Teacher;
-use Diezit\CoachviewConnector\Classes\TrainingRequest;
+use Diezit\CoachviewConnector\Classes\WebAanvraag;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
@@ -40,13 +40,13 @@ class Coachview
     public function getData(string $endpoint, array $params = null): ?array
     {
         try {
-            $response = $this->doRequest($endpoint, $params);
+            $response = $this->doRequest($endpoint, 'GET', $params);
             if (!$response) {
                 return null;
             }
             if ($response->getStatusCode() === 401) {
                 $this->refreshAccessToken();
-                $response = $this->doRequest($endpoint, $params);
+                $response = $this->doRequest($endpoint, 'GET', $params);
             }
             return json_decode((string)$response->getBody());
         } catch (RequestException $exception) {
@@ -56,14 +56,15 @@ class Coachview
         }
     }
 
-    public function doRequest(string $endpoint, array $params = null): ?ResponseInterface
+    public function doRequest(string $endpoint, string $method, array $params = null): ?ResponseInterface
     {
         try {
+            $dataType = $method == 'GET' ? 'query' : 'json';
             return $this->client->request(
-                'GET',
+                $method,
                 $this->apiRoot.$endpoint,
                 [
-                    'query' => $params,
+                    $dataType => $params,
                     'headers' => [
                         'Authorization' => 'Bearer '.$this->getAccessToken()
                     ]
@@ -120,9 +121,9 @@ class Coachview
         Cache::put(self::CACHE_KEY_ACCESS_TOKEN, $tokenData->access_token, $tokenData->expires_in);
     }
 
-    public function course(): Course
+    public function course(): Opleiding
     {
-        return new Course($this);
+        return new Opleiding($this);
     }
 
     public function courseComponent(): CourseComponent
@@ -135,9 +136,9 @@ class Coachview
         return new CourseComponentTeacher($this);
     }
 
-    public function trainingRequest(): TrainingRequest
+    public function webAanvraag(): WebAanvraag
     {
-        return new TrainingRequest($this);
+        return new WebAanvraag($this);
     }
 
     public function teacher(): Teacher
