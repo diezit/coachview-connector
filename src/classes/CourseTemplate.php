@@ -11,9 +11,13 @@ class CourseTemplate extends CoachviewData
     protected $id;
     protected $name;
     protected $code;
+    protected $purpose;
     protected $publishOnWebsite;
+    protected $targetAudience;
+    protected $preliminaryEducation;
     protected $isInactive;
     protected $comments;
+    protected $description;
 
     public function all($offset = null, $limit = null): Collection
     {
@@ -37,6 +41,10 @@ class CourseTemplate extends CoachviewData
             ->setCode($coachViewCourseTemplate->code)
             ->setPublishOnWebsite($coachViewCourseTemplate->publicatieWebsite)
             ->setIsInactive($coachViewCourseTemplate->inactief)
+            ->setPurpose($coachViewCourseTemplate->doel)
+            ->setTargetAudience($coachViewCourseTemplate->doelgroep)
+            ->setPreliminaryEducation($coachViewCourseTemplate->vooropleiding)
+            ->setDescription($coachViewCourseTemplate->omschrijvingInhoud)
             ->setComments($coachViewCourseTemplate->opmerking);
     }
 
@@ -73,6 +81,39 @@ class CourseTemplate extends CoachviewData
         return $this;
     }
 
+    public function getPurpose(): ?string
+    {
+        return $this->purpose;
+    }
+
+    public function setPurpose(string $purpose): self
+    {
+        $this->purpose = $purpose;
+        return $this;
+    }
+
+    public function getTargetAudience(): ?string
+    {
+        return $this->purpose;
+    }
+
+    public function setTargetAudience(string $targetAudience): self
+    {
+        $this->targetAudience = $targetAudience;
+        return $this;
+    }
+
+    public function getPreliminaryEducation(): ?string
+    {
+        return $this->preliminaryEducation;
+    }
+
+    public function setPreliminaryEducation(string $preliminaryEducation): self
+    {
+        $this->preliminaryEducation = $preliminaryEducation;
+        return $this;
+    }
+
     public function getPublishOnWebsite(): bool
     {
         return $this->publishOnWebsite;
@@ -92,6 +133,17 @@ class CourseTemplate extends CoachviewData
     public function setIsInactive(bool $status): self
     {
         $this->isInactive = $status;
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description): self
+    {
+        $this->description = $description;
         return $this;
     }
 

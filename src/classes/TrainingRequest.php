@@ -6,113 +6,101 @@ class TrainingRequest extends CoachviewData
 {
     protected $reference;
     protected $comments;
-    protected $numberOfParticipants;
+    protected $executionTime;
+    protected $isOrder = false;
     protected $company;
     protected $contactPerson;
     protected $debtor;
     protected $participants = [];
     protected $courses;
 
-    /**
-     * @return string
-     */
-    public function getReference(): string
+    public function getReference(): ?string
     {
         return $this->reference;
     }
 
-    /**
-     * @param  string  $reference
-     */
     public function setReference(string $reference): void
     {
         $this->reference = $reference;
     }
 
-    /**
-     * @return string
-     */
-    public function getComments()
+    public function getExecutionTime(): ?string
+    {
+        return $this->executionTime;
+    }
+
+    public function setExecutionTime(string $executionTime): self
+    {
+        $this->executionTime = $executionTime;
+        return $this;
+    }
+
+    public function getComments(): ?string
     {
         return $this->comments;
     }
 
-    /**
-     * @param  string  $comments
-     */
     public function setComments(string $comments): void
     {
         $this->comments = $comments;
     }
 
-    /**
-     * @return int
-     */
     public function getNumberOfParticipants(): int
     {
-        return $this->numberOfParticipants;
+        return count($this->participants);
     }
 
-    /**
-     * @param  int  $numberOfParticipants
-     */
-    public function setNumberOfParticipants(int $numberOfParticipants): void
-    {
-        $this->numberOfParticipants = $numberOfParticipants;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCompany()
+    public function getCompany(): string
     {
         return $this->company;
     }
 
-    /**
-     * @param  mixed  $company
-     */
-    public function setCompany($company): void
+    public function setCompany(string $company): self
     {
         $this->company = $company;
+        return $this;
     }
 
-    /**
-     * @return mixed
-     */
+    public function getIsOrder(): bool
+    {
+        return $this->isOrder;
+    }
+
+    public function setIsOrder(bool $isOrder): self
+    {
+        $this->isOrder = $isOrder;
+        return $this;
+    }
+
     public function getDebtor()
     {
         return $this->debtor;
     }
 
-    /**
-     * @param  Debtor  $debtor
-     */
-    public function setDebtor(Debtor $debtor): void
+    public function setDebtor(Debtor $debtor): self
     {
         $this->debtor = $debtor;
+        return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCourses()
     {
         return $this->courses;
     }
 
     /**
-     * @param  mixed  $courses
+     * @param  mixed  $courseId  CoachView ID of course
      */
-    public function setCourses($courses): void
+    public function addCourse(string $courseId): self
     {
-        $this->courses = $courses;
+        $this->courses[] = $courseId;
+        return $this;
     }
 
-
-    public function addParticipant(Person $person)
+    public function addParticipant(Person $person): self
     {
         $this->participants[] = $person;
+        return $this;
     }
 
     public function setContactPerson(Person $person)
@@ -120,27 +108,32 @@ class TrainingRequest extends CoachviewData
         $this->contactPerson = $person;
     }
 
-    public function store()
+    public function getContactPerson()
     {
-//        dd($this->getSoapRequest());
-//        Soap::to('https://secure.coachview.net/Webservice/speciaal.asmx?WSDL')->call('ToevoegenWebAanvraagV2', [
-//            'aWebserviceAuthentication' => $this->coachview->getSoapApiKey(),
-//            'aWebAanvraag' => $this->getSoapRequest()
-//        ]);
-//        dd('storing!');
+        return $this->contactPerson;
     }
 
-    /**
-     * @return string containing XML data
-     */
-    private function getSoapRequest(): string
+    public function submit()
     {
-//        $xml = new \SimpleXMLElement('<WebAanvraag/>');
-//        $onderdelen = $xml->addAttribute('WebAanvraagOnderdelen');
-//        $onderdeel = $onderdelen->addAttribute('WebAanvraagOnderdeel');
-//        $onderdeel->addAttribute('Code', 'AVV1965.D1.PL-1');
-//        $onderdeel->addAttribute('Naam', 'test');
-//
-//        dd($xml);
+        $courses = [];
+        foreach ($this->courses as $courseId) {
+            $courses[] = (object)[
+                'opleidingId' => $courseId
+            ];
+        }
+
+        $postData = [
+            'referentieNrKlant' => $this->getReference(),
+            'opmerking' => $this->getComments(),
+            'aantalPersonen' => $this->getNumberOfParticipants(),
+            'uitvoeringstermijn' => $this->getExecutionTime(),
+            'aanvraagIsOrder' => $this->getIsOrder(),
+            'opleidingen' => $courses,
+            'contactpersoon' => $this->getContactPerson(),
+        ];
+
+        dd($postData);
+
+        $this->coachview->postData('/api/v1/Webaanvragen', $postData);
     }
 }
