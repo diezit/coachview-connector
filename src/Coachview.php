@@ -25,25 +25,16 @@ class Coachview
     /** @var string */
     private $secret;
 
-    /** @var string */
-    private $soapApiKey;
-
     /** @var Client */
     private $client;
 
-    public function __construct(string $apiRoot, string $clientId, string $secret, string $soapApiKey)
+    public function __construct(string $apiRoot, string $clientId, string $secret)
     {
         $this->apiRoot = $apiRoot;
         $this->clientId = $clientId;
         $this->secret = $secret;
-        $this->soapApiKey = $soapApiKey;
 
         $this->client = new Client();
-    }
-
-    public function getSoapApiKey(): string
-    {
-        return $this->soapApiKey;
     }
 
     public function getData(string $endpoint, array $params = null): ?array
@@ -68,16 +59,16 @@ class Coachview
     public function doRequest(string $endpoint, array $params = null): ?ResponseInterface
     {
         try {
-                return $this->client->request(
-                    'GET',
-                    $this->apiRoot.$endpoint,
-                    [
-                        'query' => $params,
-                        'headers' => [
-                            'Authorization' => 'Bearer '.$this->getAccessToken()
-                        ]
+            return $this->client->request(
+                'GET',
+                $this->apiRoot.$endpoint,
+                [
+                    'query' => $params,
+                    'headers' => [
+                        'Authorization' => 'Bearer '.$this->getAccessToken()
                     ]
-                );
+                ]
+            );
         } catch (RequestException $exception) {
             // @TODO: remove below Exception when going live. This is to make errors more verbose while testing.
             if (!app()->environment('production')) {
