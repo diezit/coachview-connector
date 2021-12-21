@@ -18,6 +18,7 @@ class Opleidingssoort extends CoachviewData
     protected $opmerking;
     protected $publicatieWebsite;
     protected $inactief;
+    protected $prijs;
 
     public function all($offset = null, $limit = null): Collection
     {
@@ -45,6 +46,7 @@ class Opleidingssoort extends CoachviewData
             ->setOmschrijvingInhoud($coachViewCourseTemplate->omschrijvingInhoud)
             ->setOpmerking($coachViewCourseTemplate->opmerking)
             ->setPublicatieWebsite($coachViewCourseTemplate->publicatieWebsite)
+            ->setPrijs($coachViewCourseTemplate->totaalBedragExclBtwGepubliceerdeVerkoopregels ?? null)
             ->setInactief($coachViewCourseTemplate->inactief);
     }
 
@@ -58,6 +60,12 @@ class Opleidingssoort extends CoachviewData
         }
 
         return null;
+    }
+
+    public function getById(string $id): ?Opleidingssoort
+    {
+        $data = $this->coachview->getData('/api/v1/Opleidingssoorten/'.$id);
+        return $this->getCourseTemplateFromCoachViewData($data);
     }
 
     public function getId(): ?string
@@ -168,6 +176,25 @@ class Opleidingssoort extends CoachviewData
     {
         $this->inactief = $inactief;
         return $this;
+    }
+
+    public function setPrijs(?float $prijs): self
+    {
+        $this->prijs = $prijs;
+        return $this;
+    }
+
+    public function getDetails(): self
+    {
+        return $this->getById($this->getId());
+    }
+
+    public function getPrijs()
+    {
+        if (!$this->prijs) {
+            $this->prijs = $this->getDetails()->getPrijs();
+        }
+        return $this->prijs;
     }
 
 }

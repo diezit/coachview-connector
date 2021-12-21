@@ -6,6 +6,7 @@ use Cache;
 use Diezit\CoachviewConnector\Classes\Opleiding;
 use Diezit\CoachviewConnector\Classes\CourseComponent;
 use Diezit\CoachviewConnector\Classes\CourseComponentTeacher;
+use Diezit\CoachviewConnector\Classes\Opleidingssoort;
 use Diezit\CoachviewConnector\Classes\Persoon;
 use Diezit\CoachviewConnector\Classes\Teacher;
 use Diezit\CoachviewConnector\Classes\WebAanvraag;
@@ -38,7 +39,10 @@ class Coachview
         $this->client = new Client();
     }
 
-    public function getData(string $endpoint, array $params = null): ?array
+    /**
+     * @return array|object|null
+     */
+    public function getData(string $endpoint, array $params = null)
     {
         try {
             $response = $this->doRequest($endpoint, 'GET', $params);
@@ -103,9 +107,12 @@ class Coachview
                         'scope' => implode(' ', [
                             'api',
                             'Opleidingen.Lezen',
+                            'Opleidingssoorten.Lezen',
                             'Opleidingsonderdelen.Lezen',
                             'Opleidingsonderdelen_Docenten.Lezen',
                             'Opleidingssoortonderdelen.Lezen',
+                            'Opleidingssoorten_Verkoopregels.Lezen',
+                            'Verkoopregels.Lezen',
                             'Docenten.Lezen',
                             'Webaanvragen.Schrijven',
                             'Personen.Lezen',
@@ -126,6 +133,11 @@ class Coachview
     public function opleiding(): Opleiding
     {
         return new Opleiding($this);
+    }
+
+    public function opleidingssoort(): Opleidingssoort
+    {
+        return new Opleidingssoort($this);
     }
 
     public function courseComponent(): CourseComponent
