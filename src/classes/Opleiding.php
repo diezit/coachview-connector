@@ -56,9 +56,9 @@ class Opleiding extends CoachviewData
         }
 
         if ($coachViewCourse->opleidingssoortId) {
-            $template = (new CourseTemplate($this->coachview))
+            $template = (new Opleidingssoort($this->coachview))
                 ->getCourseTemplateFromCoachViewData($coachViewCourse->opleidingssoort);
-            $course->setTemplate($template);
+            $course->setOpleidingssoort($template);
         }
 
         return $course;
@@ -149,12 +149,12 @@ class Opleiding extends CoachviewData
         return $this;
     }
 
-    public function getContactPersoon(): Person
+    public function getContactPersoon(): Persoon
     {
         return $this->contactPersoon;
     }
 
-    public function setContactPersoon(Person $contactPersoon): self
+    public function setContactPersoon(Persoon $contactPersoon): self
     {
         $this->contactPersoon = $contactPersoon;
         return $this;
@@ -204,12 +204,12 @@ class Opleiding extends CoachviewData
         return $this;
     }
 
-    public function getOpleidingssoort(): ?CourseTemplate
+    public function getOpleidingssoort(): ?Opleidingssoort
     {
         return $this->opleidingssoort;
     }
 
-    private function setOpleidingssoort(CourseTemplate $opleidingssoort)
+    private function setOpleidingssoort(Opleidingssoort $opleidingssoort)
     {
         $this->opleidingssoort = $opleidingssoort;
     }

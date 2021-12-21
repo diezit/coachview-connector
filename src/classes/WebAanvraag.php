@@ -102,13 +102,13 @@ class WebAanvraag extends CoachviewData implements WebAanvraagInterface
         return $this;
     }
 
-    public function addDeelnemer(Person $deelnemer): self
+    public function addDeelnemer(Persoon $deelnemer): self
     {
         $this->deelnemers[] = $deelnemer;
         return $this;
     }
 
-    public function setContactpersoon(Person $person)
+    public function setContactpersoon(Persoon $person)
     {
         $this->contactpersoon = $person;
     }

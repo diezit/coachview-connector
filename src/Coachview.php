@@ -6,6 +6,7 @@ use Cache;
 use Diezit\CoachviewConnector\Classes\Opleiding;
 use Diezit\CoachviewConnector\Classes\CourseComponent;
 use Diezit\CoachviewConnector\Classes\CourseComponentTeacher;
+use Diezit\CoachviewConnector\Classes\Persoon;
 use Diezit\CoachviewConnector\Classes\Teacher;
 use Diezit\CoachviewConnector\Classes\WebAanvraag;
 use GuzzleHttp\Client;
@@ -106,7 +107,8 @@ class Coachview
                             'Opleidingsonderdelen_Docenten.Lezen',
                             'Opleidingssoortonderdelen.Lezen',
                             'Docenten.Lezen',
-                            'Webaanvragen.Schrijven'
+                            'Webaanvragen.Schrijven',
+                            'Personen.Lezen',
                         ]),
                     ]
                 ]
@@ -121,7 +123,7 @@ class Coachview
         Cache::put(self::CACHE_KEY_ACCESS_TOKEN, $tokenData->access_token, $tokenData->expires_in);
     }
 
-    public function course(): Opleiding
+    public function opleiding(): Opleiding
     {
         return new Opleiding($this);
     }
@@ -139,6 +141,11 @@ class Coachview
     public function webAanvraag(): WebAanvraag
     {
         return new WebAanvraag($this);
+    }
+
+    public function persoon(): Persoon
+    {
+        return new Persoon($this);
     }
 
     public function teacher(): Teacher
