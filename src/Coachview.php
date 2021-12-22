@@ -118,6 +118,7 @@ class Coachview
                             'Opleidingsonderdelen.Lezen',
                             'Opleidingsonderdelen_Docenten.Lezen',
                             'Opleidingssoortonderdelen.Lezen',
+                            'Opleidingssoortcategorieen.Lezen',
                             'Opleidingssoorten_Verkoopregels.Lezen',
                             'Verkoopregels.Lezen',
                             'Docenten.Lezen',
