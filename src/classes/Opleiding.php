@@ -3,11 +3,11 @@
 namespace Diezit\CoachviewConnector\Classes;
 
 use Carbon\Carbon;
-use Diezit\CoachviewConnector\Coachview;
 use Illuminate\Support\Collection;
 
 class Opleiding extends CoachviewData
 {
+    /** @var string */
     protected $id;
     protected $naam;
     protected $code;
@@ -23,11 +23,10 @@ class Opleiding extends CoachviewData
     protected $aantalPlaatsenMax;
     protected $studiePunten;
 
-    public function all($offset = null, $limit = null): Collection
+    public function all(int $offset = null, int $limit = null): Collection
     {
         $params = $this->makeParams(['skip' => $offset, 'take' => $limit]);
         $data = $this->coachview->getData('/api/v1/Opleidingen', $params);
-
 
         $response = [];
         foreach ($data as $coachViewCourse) {
@@ -65,19 +64,19 @@ class Opleiding extends CoachviewData
     }
 
     /**
-     * @return Collection|CourseComponent
+     * @return Collection|CourseComponent[]
      */
     public function components(): Collection
     {
         return $this->coachview->courseComponent()->getForCourse($this->id);
     }
 
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId($id): self
+    public function setId(?string $id): self
     {
         $this->id = $id;
         return $this;
@@ -105,23 +104,23 @@ class Opleiding extends CoachviewData
         return $this;
     }
 
-    public function getPublicatie()
+    public function getPublicatie(): ?bool
     {
         return $this->publicatie;
     }
 
-    public function setPublicatie($publicatie): self
+    public function setPublicatie(?bool $publicatie): self
     {
         $this->publicatie = $publicatie;
         return $this;
     }
 
-    public function getPublicatiePlanning()
+    public function getPublicatiePlanning(): ?bool
     {
         return $this->publicatiePlanning;
     }
 
-    public function setPublicatiePlanning($publicatiePlanning): self
+    public function setPublicatiePlanning(?bool $publicatiePlanning): self
     {
         $this->publicatiePlanning = $publicatiePlanning;
         return $this;
@@ -195,12 +194,12 @@ class Opleiding extends CoachviewData
 
     public function getAantalPlaatsenMax()
     {
-        return $this->places;
+        return $this->aantalPlaatsenMax;
     }
 
-    public function setAantalPlaatsenMax($attendees): self
+    public function setAantalPlaatsenMax($aantalPlaatsenMax): self
     {
-        $this->aantalPlaatsenMax = $attendees;
+        $this->aantalPlaatsenMax = $aantalPlaatsenMax;
         return $this;
     }
 
@@ -209,9 +208,21 @@ class Opleiding extends CoachviewData
         return $this->opleidingssoort;
     }
 
-    private function setOpleidingssoort(Opleidingssoort $opleidingssoort)
+    private function setOpleidingssoort(Opleidingssoort $opleidingssoort): self
     {
         $this->opleidingssoort = $opleidingssoort;
+        return $this;
+    }
+
+    public function getStudiePunten(): ?int
+    {
+        return $this->studiePunten;
+    }
+
+    public function setStudiePunten(?int $studiePunten): self
+    {
+        $this->studiePunten = $studiePunten;
+        return $this;
     }
 
     public function getByCode(string $code): ?Opleiding

@@ -29,5 +29,4 @@ interface PersoonInterface
     public function getGeslacht();
 
     public function getGeboorteDatum();
-
 }

@@ -11,16 +11,15 @@ class CoachviewData
     public function __construct(Coachview $coachview)
     {
         $this->coachview = $coachview;
-        return $this;
     }
 
-    public function makeParams($options)
+    public function getCoachview(): Coachview
     {
-        foreach ($options as $key => $value) {
-            if ($value == null || $value = '') {
-                unset($options[$key]);
-            }
-        }
-        return $options;
+        return $this->coachview;
+    }
+
+    public function makeParams(array $options): array
+    {
+        return array_filter($options);
     }
 }

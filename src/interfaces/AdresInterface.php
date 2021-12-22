@@ -17,5 +17,4 @@ interface AdresInterface
     public function getPlaats();
 
     public function getLandCode();
-
 }

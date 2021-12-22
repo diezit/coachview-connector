@@ -44,24 +44,15 @@ class Coachview
      */
     public function getData(string $endpoint, array $params = null)
     {
-        try {
-            $response = $this->doRequest($endpoint, 'GET', $params);
-            if (!$response) {
-                return null;
-            }
-            if ($response->getStatusCode() === 401) {
-                $this->refreshAccessToken();
-                $response = $this->doRequest($endpoint, 'GET', $params);
-            }
-            return json_decode((string)$response->getBody());
-        } catch (RequestException $exception) {
-            // @TODO: remove below Exception when going live. This is to make errors more verbose while testing.
-            dd($exception);
+        $response = $this->doRequest($endpoint, 'GET', $params);
+        if (!$response) {
             return null;
         }
+
+        return json_decode((string)$response->getBody());
     }
 
-    public function doRequest(string $endpoint, string $method, array $params = null): ?ResponseInterface
+    public function doRequest(string $endpoint, string $method, array $params = null, bool $isRetrying = false): ?ResponseInterface
     {
         try {
             $dataType = $method == 'GET' ? 'query' : 'json';
@@ -76,6 +67,12 @@ class Coachview
                 ]
             );
         } catch (RequestException $exception) {
+            // try once more if code is 401 (unauthorized)
+            if ($exception->getCode() === 401 && !$isRetrying) {
+                $this->refreshAccessToken();
+                return $this->doRequest($endpoint, $method, $params, true);
+            }
+
             // @TODO: remove below Exception when going live. This is to make errors more verbose while testing.
             if (!app()->environment('production')) {
                 dd($exception);

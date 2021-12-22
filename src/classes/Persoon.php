@@ -2,7 +2,6 @@
 
 namespace Diezit\CoachviewConnector\Classes;
 
-use Diezit\AcademieVoorVastgoed\Classes\Address;
 use Diezit\CoachviewConnector\Interfaces\AdresInterface;
 use Diezit\CoachviewConnector\Interfaces\PersoonInterface;
 use Illuminate\Support\Collection;
@@ -201,6 +200,4 @@ class Persoon extends CoachviewData implements PersoonInterface
         $this->geboorteDatum = $geboorteDatum;
         return $this;
     }
-
-
 }

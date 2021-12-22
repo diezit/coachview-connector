@@ -6,6 +6,10 @@ use Illuminate\Support\Collection;
 
 class CourseComponentTemplate extends CoachviewData
 {
+    use FreeFieldsTrait {
+        getFreeFields as protected traitGetFreeFields;
+    }
+
     protected $id;
     protected $code;
     protected $name;
@@ -220,21 +224,6 @@ class CourseComponentTemplate extends CoachviewData
      */
     public function getFreeFields(): array
     {
-        $params = $this->makeParams(['where' => 'recordId='.$this->id]);
-        $coachViewData = $this->coachview->getData('/api/v1/Opleidingssoortonderdelen/Vrijevelden', $params);
-        $freeFields = [];
-        foreach ($coachViewData as $freeField) {
-            $freeFields[] = (new FreeField($this->coachview))
-                ->setOrder($freeField->vrijveldDefinitie->volgorde)
-                ->setCode($freeField->vrijveldDefinitie->code)
-                ->setLabel($freeField->vrijveldDefinitie->label)
-                ->setType($freeField->vrijveldDefinitie->vrijveldTypeId)
-                ->setExpression($freeField->vrijveldDefinitie->expressie)
-                ->setInactive($freeField->vrijveldDefinitie->inactief)
-                ->setConfidential($freeField->vrijveldDefinitie->vertrouwelijk)
-                ->setData($freeField->data);
-        }
-        return $freeFields;
+        return $this->traitGetFreeFields('/api/v1/Opleidingssoortonderdelen/Vrijevelden');
     }
-
 }

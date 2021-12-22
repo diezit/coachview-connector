@@ -2,12 +2,14 @@
 
 namespace Diezit\CoachviewConnector\Classes;
 
-use Carbon\Carbon;
-use Diezit\CoachviewConnector\Coachview;
 use Illuminate\Support\Collection;
 
 class Opleidingssoort extends CoachviewData
 {
+    use FreeFieldsTrait {
+        getFreeFields as protected traitGetFreeFields;
+    }
+
     protected $id;
     protected $code;
     protected $naam;
@@ -18,9 +20,9 @@ class Opleidingssoort extends CoachviewData
     protected $opmerking;
     protected $publicatieWebsite;
     protected $inactief;
-    protected $prijs;
+    protected $prijsExclBtw;
 
-    public function all($offset = null, $limit = null): Collection
+    public function all(int $offset = null, int $limit = null): Collection
     {
         $params = $this->makeParams(['skip' => $offset, 'take' => $limit]);
         $data = $this->coachview->getData('/api/v1/Opleidingssoorten', $params);
@@ -178,10 +180,18 @@ class Opleidingssoort extends CoachviewData
         return $this;
     }
 
-    public function setPrijs(?float $prijs): self
+    public function setPrijsExclBtw(?float $prijsExclBtw): self
     {
-        $this->prijs = $prijs;
+        $this->prijsExclBtw = $prijsExclBtw;
         return $this;
+    }
+
+    public function getPrijsExclBtw(): ?float
+    {
+        if ($this->prijsExclBtw === null) {
+            $this->getDetails();
+        }
+        return $this->prijsExclBtw;
     }
 
     public function getDetails(): self
@@ -189,12 +199,16 @@ class Opleidingssoort extends CoachviewData
         return $this->getById($this->getId());
     }
 
-    public function getPrijs()
     {
-        if (!$this->prijs) {
-            $this->prijs = $this->getDetails()->getPrijs();
         }
-        return $this->prijs;
+    }
+
+    /**
+     * @return array|FreeField[]
+     */
+    public function getFreeFields(): array
+    {
+        return $this->traitGetFreeFields('/api/v1/Opleidingssoorten/Vrijevelden');
     }
 
 }
