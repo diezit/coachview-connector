@@ -36,9 +36,9 @@ class Opleiding extends CoachviewData
         return collect($response);
     }
 
-    private function getCourseFromCoachViewData($coachViewCourse): Opleiding
+    public function hydrate(object $coachViewCourse): Opleiding
     {
-        $course = (new Opleiding($this->coachview))
+        $this
             ->setId($coachViewCourse->id)
             ->setNaam($coachViewCourse->naam)
             ->setCode($coachViewCourse->code)
@@ -51,16 +51,20 @@ class Opleiding extends CoachviewData
             ->setAantalPlaatsenMax($coachViewCourse->aantalPlaatsenMax);
 
         if ($coachViewCourse->startLocatie) {
-            $course->setStartLocatie($coachViewCourse->startLocatie->lokaal);
+            $this->setStartLocatie($coachViewCourse->startLocatie->lokaal);
         }
 
         if ($coachViewCourse->opleidingssoortId) {
-            $template = (new Opleidingssoort($this->coachview))
-                ->getCourseTemplateFromCoachViewData($coachViewCourse->opleidingssoort);
-            $course->setOpleidingssoort($template);
+            $template = (new Opleidingssoort($this->coachview))->hydrate($coachViewCourse->opleidingssoort);
+            $this->setOpleidingssoort($template);
         }
 
-        return $course;
+        return $this;
+    }
+
+    protected function getCourseFromCoachViewData($coachViewCourse): Opleiding
+    {
+        return (new Opleiding($this->coachview))->hydrate($coachViewCourse);
     }
 
     /**
@@ -229,11 +233,7 @@ class Opleiding extends CoachviewData
     {
         $params = $this->makeParams(['where' => 'code='.$code]);
         $data = $this->coachview->getData('/api/v1/Opleidingen', $params);
-
-        foreach ($data as $coachViewCourse) {
-            return $this->getCourseFromCoachViewData($coachViewCourse);
-        }
-
-        return null;
+        $coachViewCourse = current($data);
+        return $this->hydrate($coachViewCourse);
     }
 }

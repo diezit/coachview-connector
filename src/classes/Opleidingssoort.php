@@ -22,11 +22,15 @@ class Opleidingssoort extends CoachviewData
     protected $inactief;
     protected $prijsExclBtw;
 
+    public function count(): ?int
+    {
+        return $this->coachview->getRowCount('/api/v1/Opleidingssoorten');
+    }
+
     public function all(int $offset = null, int $limit = null): Collection
     {
         $params = $this->makeParams(['skip' => $offset, 'take' => $limit]);
         $data = $this->coachview->getData('/api/v1/Opleidingssoorten', $params);
-
 
         $response = [];
         foreach ($data as $coachViewCourseTemplate) {
@@ -36,9 +40,9 @@ class Opleidingssoort extends CoachviewData
         return collect($response);
     }
 
-    public function getCourseTemplateFromCoachViewData($coachViewCourseTemplate): Opleidingssoort
+    public function hydrate(object $coachViewCourseTemplate): Opleidingssoort
     {
-        return (new Opleidingssoort($this->coachview))
+        $this
             ->setId($coachViewCourseTemplate->id)
             ->setCode($coachViewCourseTemplate->code)
             ->setNaam($coachViewCourseTemplate->naam)
@@ -48,26 +52,15 @@ class Opleidingssoort extends CoachviewData
             ->setOmschrijvingInhoud($coachViewCourseTemplate->omschrijvingInhoud)
             ->setOpmerking($coachViewCourseTemplate->opmerking)
             ->setPublicatieWebsite($coachViewCourseTemplate->publicatieWebsite)
-            ->setPrijs($coachViewCourseTemplate->totaalBedragExclBtwGepubliceerdeVerkoopregels ?? null)
+            ->setPrijsExclBtw($coachViewCourseTemplate->totaalBedragExclBtwGepubliceerdeVerkoopregels ?? null)
             ->setInactief($coachViewCourseTemplate->inactief);
+
+        return $this;
     }
 
-    public function getByCode(string $code): ?Opleidingssoort
+    protected function getCourseTemplateFromCoachViewData($coachViewCourseTemplate): Opleidingssoort
     {
-        $params = $this->makeParams(['where' => 'code='.$code]);
-        $data = $this->coachview->getData('/api/v1/Opleidingssoorten', $params);
-
-        foreach ($data as $coachViewCourseTemplate) {
-            return $this->getCourseTemplateFromCoachViewData($coachViewCourseTemplate);
-        }
-
-        return null;
-    }
-
-    public function getById(string $id): ?Opleidingssoort
-    {
-        $data = $this->coachview->getData('/api/v1/Opleidingssoorten/'.$id);
-        return $this->getCourseTemplateFromCoachViewData($data);
+        return (new Opleidingssoort($this->coachview))->hydrate($coachViewCourseTemplate);
     }
 
     public function getId(): ?string
@@ -199,8 +192,22 @@ class Opleidingssoort extends CoachviewData
         return $this->getById($this->getId());
     }
 
+    public function getByCode(string $code): ?Opleidingssoort
     {
+        $params = $this->makeParams(['where' => 'code='.$code]);
+        $data = $this->coachview->getData('/api/v1/Opleidingssoorten', $params);
+
+        foreach ($data as $coachViewCourseTemplate) {
+            return $this->hydrate($coachViewCourseTemplate);
         }
+
+        return null;
+    }
+
+    public function getById(string $id): ?Opleidingssoort
+    {
+        $data = $this->coachview->getData('/api/v1/Opleidingssoorten/'.$id);
+        return $this->hydrate($data);
     }
 
     /**
@@ -211,4 +218,15 @@ class Opleidingssoort extends CoachviewData
         return $this->traitGetFreeFields('/api/v1/Opleidingssoorten/Vrijevelden');
     }
 
+    public function getCategorieen(): array
+    {
+        $coachView = $this->getCoachview();
+        $params = $this->makeParams(['OpleidingssoortId' => $this->getId()]);
+        $coachViewData = $coachView->getData('/api/v1/Opleidingssoortcategorieen', $params);
+        $categories = [];
+        foreach ($coachViewData as $categoryField) {
+            $categories[] = $categoryField->naam;
+        }
+        return $categories;
+    }
 }
