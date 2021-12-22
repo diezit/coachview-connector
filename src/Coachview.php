@@ -52,6 +52,16 @@ class Coachview
         return json_decode((string)$response->getBody());
     }
 
+    public function getRowCount(string $endpoint): ?int
+    {
+        $response = $this->doRequest($endpoint, 'GET', ['Count' => 'true']);
+        if (!$response) {
+            return null;
+        }
+
+        return (int)$response->getHeaderLine('RowCount');
+    }
+
     public function doRequest(string $endpoint, string $method, array $params = null, bool $isRetrying = false): ?ResponseInterface
     {
         try {

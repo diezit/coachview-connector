@@ -23,6 +23,11 @@ class Opleiding extends CoachviewData
     protected $aantalPlaatsenMax;
     protected $studiePunten;
 
+    public function count(): ?int
+    {
+        return $this->coachview->getRowCount('/api/v1/Opleidingen');
+    }
+
     public function all(int $offset = null, int $limit = null): Collection
     {
         $params = $this->makeParams(['skip' => $offset, 'take' => $limit]);
