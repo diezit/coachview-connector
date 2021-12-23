@@ -4,7 +4,7 @@ namespace Diezit\CoachviewConnector\Classes;
 
 use Carbon\Carbon;
 use Diezit\CoachviewConnector\Interfaces\OpleidingInterface;
-use Diezit\CoachviewConnector\interfaces\OpleidingssoortInterface;
+use Diezit\CoachviewConnector\Interfaces\OpleidingssoortInterface;
 use Diezit\CoachviewConnector\Interfaces\PersoonInterface;
 use Illuminate\Support\Collection;
 

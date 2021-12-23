@@ -2,7 +2,7 @@
 
 namespace Diezit\CoachviewConnector\Classes;
 
-use Diezit\CoachviewConnector\interfaces\OpleidingssoortInterface;
+use Diezit\CoachviewConnector\Interfaces\OpleidingssoortInterface;
 use Illuminate\Support\Collection;
 
 class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
