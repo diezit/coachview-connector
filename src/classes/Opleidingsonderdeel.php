@@ -2,25 +2,40 @@
 
 namespace Diezit\CoachviewConnector\Classes;
 
+use Carbon\Carbon;
+use Diezit\CoachviewConnector\Interfaces\OpleidingInterface;
+use Diezit\CoachviewConnector\Interfaces\OpleidingsonderdeelInterface;
 use Illuminate\Support\Collection;
 
-class Opleidingsonderdeel extends CoachviewData
+class Opleidingsonderdeel extends CoachviewData implements OpleidingsonderdeelInterface
 {
     use FreeFieldsTrait {
         getFreeFields as protected traitGetFreeFields;
     }
 
+    /** @var null|string */
     protected $id;
+
+    /** @var null|string */
     protected $code;
+
+    /** @var null|string */
     protected $naam;
-    protected $doel;
-    protected $doelgroep;
-    protected $vooropleiding;
-    protected $omschrijvingInhoud;
-    protected $opmerking;
-    protected $publicatieWebsite;
-    protected $inactief;
-    protected $prijsExclBtw;
+
+    /** @var null|string */
+    protected $omschrijving;
+
+    /** @var null|Carbon */
+    protected $startDatum;
+
+    /** @var null|Carbon */
+    protected $eindDatum;
+
+    /** @var null|string */
+    protected $locatie;
+
+    /** @var null|OpleidingInterface */
+    protected $opleiding;
 
     public function count(): ?int
     {
@@ -39,35 +54,58 @@ class Opleidingsonderdeel extends CoachviewData
         $data = $this->coachview->getData('/api/v1/Opleidingsonderdelen', $params);
 
         $response = [];
-        foreach ($data as $coachViewCourseTemplate) {
-            $response[] = $this->getCourseTemplateFromCoachViewData($coachViewCourseTemplate);
+        foreach ($data as $coachViewOpleidingsonderdeel) {
+            $response[] = $this->getPlanningsItemFromCoachViewData($coachViewOpleidingsonderdeel);
         }
 
         return collect($response);
     }
 
-    public function hydrate(object $coachViewCourseTemplate): Opleidingsonderdeel
+    /**
+     * @param  string  $opleidingId
+     * @param  int|null  $offset
+     * @param  int|null  $limit
+     *
+     * @return Collection|Opleidingsonderdeel[]
+     */
+    public function allByOpleidingId(string $opleidingId, int $offset = null, int $limit = null): Collection
     {
-        dd($coachViewCourseTemplate);
+        $params = $this->makeParams(['where' => 'opleidingId='.$opleidingId, 'skip' => $offset, 'take' => $limit]);
+        $data = $this->coachview->getData('/api/v1/Opleidingsonderdelen', $params);
+
+        $response = [];
+        foreach ($data as $coachViewOpleidingsonderdeel) {
+            $response[] = $this->getPlanningsItemFromCoachViewData($coachViewOpleidingsonderdeel);
+        }
+
+        return collect($response);
+    }
+
+    public function hydrate(object $coachViewOpleidingsonderdeel): Opleidingsonderdeel
+    {
         $this
-            ->setId($coachViewCourseTemplate->id)
-            ->setCode($coachViewCourseTemplate->code)
-            ->setNaam($coachViewCourseTemplate->naam)
-            ->setDoel($coachViewCourseTemplate->doel)
-            ->setDoelgroep($coachViewCourseTemplate->doelgroep)
-            ->setVooropleiding($coachViewCourseTemplate->vooropleiding)
-            ->setOmschrijvingInhoud($coachViewCourseTemplate->omschrijvingInhoud)
-            ->setOpmerking($coachViewCourseTemplate->opmerking)
-            ->setPublicatieWebsite($coachViewCourseTemplate->publicatieWebsite)
-            ->setPrijsExclBtw($coachViewCourseTemplate->totaalBedragExclBtwGepubliceerdeVerkoopregels ?? null)
-            ->setInactief($coachViewCourseTemplate->inactief);
+            ->setId($coachViewOpleidingsonderdeel->id)
+            ->setCode($coachViewOpleidingsonderdeel->code)
+            ->setNaam($coachViewOpleidingsonderdeel->naam)
+            ->setOmschrijving($coachViewOpleidingsonderdeel->omschrijving)
+            ->setStartDatum(new Carbon($coachViewOpleidingsonderdeel->datumTijdVan))
+            ->setEindDatum(new Carbon($coachViewOpleidingsonderdeel->datumTijdTot))
+        ;
+        if ($coachViewOpleidingsonderdeel->locatie && $coachViewOpleidingsonderdeel->locatie->bedrijf) {
+            $this->setLocatie($coachViewOpleidingsonderdeel->locatie->bedrijf->naam);
+        }
+        if ($coachViewOpleidingsonderdeel->opleiding) {
+            $opleiding = new Opleiding($this->coachview);
+            $opleiding->hydrate($coachViewOpleidingsonderdeel->opleiding);
+            $this->setOpleiding($opleiding);
+        }
 
         return $this;
     }
 
-    protected function getCourseTemplateFromCoachViewData($coachViewCourseTemplate): Opleidingsonderdeel
+    protected function getPlanningsItemFromCoachViewData($coachViewOpleidingsonderdeel): Opleidingsonderdeel
     {
-        return (new Opleidingsonderdeel($this->coachview))->hydrate($coachViewCourseTemplate);
+        return (new Opleidingsonderdeel($this->coachview))->hydrate($coachViewOpleidingsonderdeel);
     }
 
     public function getId(): ?string
@@ -75,9 +113,10 @@ class Opleidingsonderdeel extends CoachviewData
         return $this->id;
     }
 
-    public function setId(?string $id): self
+    public function setId(?string $id): Opleidingsonderdeel
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -86,9 +125,10 @@ class Opleidingsonderdeel extends CoachviewData
         return $this->code;
     }
 
-    public function setCode(?string $code): self
+    public function setCode(?string $code): Opleidingsonderdeel
     {
         $this->code = $code;
+
         return $this;
     }
 
@@ -97,101 +137,71 @@ class Opleidingsonderdeel extends CoachviewData
         return $this->naam;
     }
 
-    public function setNaam(?string $naam): self
+    public function setNaam(?string $naam): Opleidingsonderdeel
     {
         $this->naam = $naam;
+
         return $this;
     }
 
-    public function getDoel(): ?string
+    public function getOmschrijving(): ?string
     {
-        return $this->doel;
+        return $this->omschrijving;
     }
 
-    public function setDoel(?string $doel): self
+    public function setOmschrijving(?string $omschrijving): Opleidingsonderdeel
     {
-        $this->doel = $doel;
+        $this->omschrijving = $omschrijving;
+
         return $this;
     }
 
-    public function getDoelgroep(): ?string
+    public function getStartDatum(): ?Carbon
     {
-        return $this->doelgroep;
+        return $this->startDatum;
     }
 
-    public function setDoelgroep(?string $doelgroep): self
+    public function setStartDatum(?Carbon $startDatum): Opleidingsonderdeel
     {
-        $this->doelgroep = $doelgroep;
+        $this->startDatum = $startDatum;
+
         return $this;
     }
 
-    public function getVooropleiding(): ?string
+    public function getEindDatum(): ?Carbon
     {
-        return $this->vooropleiding;
+        return $this->eindDatum;
     }
 
-    public function setVooropleiding(?string $vooropleiding): self
+    public function setEindDatum(?Carbon $eindDatum): Opleidingsonderdeel
     {
-        $this->vooropleiding = $vooropleiding;
+        $this->eindDatum = $eindDatum;
+
         return $this;
     }
 
-    public function getOmschrijvingInhoud(): ?string
+    public function getLocatie(): ?string
     {
-        return $this->omschrijvingInhoud;
+        return $this->locatie;
     }
 
-    public function setOmschrijvingInhoud(?string $omschrijvingInhoud): self
+    public function setLocatie(?string $locatie): Opleidingsonderdeel
     {
-        $this->omschrijvingInhoud = $omschrijvingInhoud;
+        $this->locatie = $locatie;
+
         return $this;
     }
 
-    public function getOpmerking(): ?string
+    public function getOpleiding(): ?OpleidingInterface
     {
-        return $this->opmerking;
+        return $this->opleiding;
     }
 
-    public function setOpmerking(?string $opmerking): self
+    public function setOpleiding(?OpleidingInterface $opleiding): Opleidingsonderdeel
     {
-        $this->opmerking = $opmerking;
+        $this->opleiding = $opleiding;
+
         return $this;
-    }
-
-    public function getPublicatieWebsite(): ?bool
-    {
-        return $this->publicatieWebsite;
-    }
-
-    public function setPublicatieWebsite(bool $publicatieWebsite): self
-    {
-        $this->publicatieWebsite = $publicatieWebsite;
-        return $this;
-    }
-
-    public function getInactief(): ?bool
-    {
-        return $this->inactief;
-    }
-
-    public function setInactief(bool $inactief): self
-    {
-        $this->inactief = $inactief;
-        return $this;
-    }
-
-    public function setPrijsExclBtw(?float $prijsExclBtw): self
-    {
-        $this->prijsExclBtw = $prijsExclBtw;
-        return $this;
-    }
-
-    public function getPrijsExclBtw(): ?float
-    {
-        if ($this->prijsExclBtw === null) {
-            $this->getDetails();
-        }
-        return $this->prijsExclBtw;
     }
 
     public function getDetails(): self
@@ -223,17 +233,5 @@ class Opleidingsonderdeel extends CoachviewData
     public function getFreeFields(): array
     {
         return $this->traitGetFreeFields('/api/v1/Opleidingsonderdelen/Vrijevelden');
-    }
-
-    public function getCategorieen(): array
-    {
-        $coachView = $this->getCoachview();
-        $params = $this->makeParams(['OpleidingssoortId' => $this->getId()]);
-        $coachViewData = $coachView->getData('/api/v1/Opleidingssoortcategorieen', $params);
-        $categories = [];
-        foreach ($coachViewData as $categoryField) {
-            $categories[] = $categoryField->naam;
-        }
-        return $categories;
     }
 }
