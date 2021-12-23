@@ -204,7 +204,7 @@ class Opleidingsonderdeel extends CoachviewData implements OpleidingsonderdeelIn
         return $this;
     }
 
-    public function getDetails(): self
+    public function getDetails(): OpleidingsonderdeelInterface
     {
         return $this->getById($this->getId());
     }
