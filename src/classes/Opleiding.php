@@ -4,6 +4,7 @@ namespace Diezit\CoachviewConnector\Classes;
 
 use Carbon\Carbon;
 use Diezit\CoachviewConnector\Interfaces\OpleidingInterface;
+use Diezit\CoachviewConnector\interfaces\OpleidingssoortInterface;
 use Diezit\CoachviewConnector\Interfaces\PersoonInterface;
 use Illuminate\Support\Collection;
 
@@ -52,16 +53,16 @@ class Opleiding extends CoachviewData implements OpleidingInterface
             ->setPublicatie($coachViewCourse->publicatie)
             ->setPublicatiePlanning($coachViewCourse->publicatiePlanning)
             ->setOpmerking($coachViewCourse->opmerking)
-            ->setStartDatum($coachViewCourse->startDatum)
-            ->setEindDatum($coachViewCourse->eindDatum)
-            ->setAantalPlaatsenBezet($coachViewCourse->aantalPlaatsenBezet)
-            ->setAantalPlaatsenMax($coachViewCourse->aantalPlaatsenMax);
+            ->setStartDatum($coachViewCourse->startDatum ?? null)
+            ->setEindDatum($coachViewCourse->eindDatum ?? null)
+            ->setAantalPlaatsenBezet($coachViewCourse->aantalPlaatsenBezet ?? null)
+            ->setAantalPlaatsenMax($coachViewCourse->aantalPlaatsenMax ?? null);
 
-        if ($coachViewCourse->startLocatie) {
+        if ($coachViewCourse->startLocatie ?? false) {
             $this->setStartLocatie($coachViewCourse->startLocatie->lokaal);
         }
 
-        if ($coachViewCourse->opleidingssoortId) {
+        if ($coachViewCourse->opleidingssoort ?? false) {
             $template = (new Opleidingssoort($this->coachview))->hydrate($coachViewCourse->opleidingssoort);
             $this->setOpleidingssoort($template);
         }
@@ -214,7 +215,7 @@ class Opleiding extends CoachviewData implements OpleidingInterface
         return $this;
     }
 
-    public function getOpleidingssoort(): ?Opleidingssoort
+    public function getOpleidingssoort(): ?OpleidingssoortInterface
     {
         return $this->opleidingssoort;
     }
