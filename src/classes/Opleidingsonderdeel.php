@@ -2,10 +2,9 @@
 
 namespace Diezit\CoachviewConnector\Classes;
 
-use Diezit\CoachviewConnector\interfaces\OpleidingssoortInterface;
 use Illuminate\Support\Collection;
 
-class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
+class Opleidingsonderdeel extends CoachviewData
 {
     use FreeFieldsTrait {
         getFreeFields as protected traitGetFreeFields;
@@ -25,19 +24,19 @@ class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
 
     public function count(): ?int
     {
-        return $this->coachview->getRowCount('/api/v1/Opleidingssoorten');
+        return $this->coachview->getRowCount('/api/v1/Opleidingsonderdelen');
     }
 
     /**
      * @param  int|null  $offset
      * @param  int|null  $limit
      *
-     * @return Collection|Opleidingssoort[]
+     * @return Collection|Opleidingsonderdeel[]
      */
     public function all(int $offset = null, int $limit = null): Collection
     {
         $params = $this->makeParams(['skip' => $offset, 'take' => $limit]);
-        $data = $this->coachview->getData('/api/v1/Opleidingssoorten', $params);
+        $data = $this->coachview->getData('/api/v1/Opleidingsonderdelen', $params);
 
         $response = [];
         foreach ($data as $coachViewCourseTemplate) {
@@ -47,8 +46,9 @@ class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
         return collect($response);
     }
 
-    public function hydrate(object $coachViewCourseTemplate): Opleidingssoort
+    public function hydrate(object $coachViewCourseTemplate): Opleidingsonderdeel
     {
+        dd($coachViewCourseTemplate);
         $this
             ->setId($coachViewCourseTemplate->id)
             ->setCode($coachViewCourseTemplate->code)
@@ -65,9 +65,9 @@ class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
         return $this;
     }
 
-    protected function getCourseTemplateFromCoachViewData($coachViewCourseTemplate): Opleidingssoort
+    protected function getCourseTemplateFromCoachViewData($coachViewCourseTemplate): Opleidingsonderdeel
     {
-        return (new Opleidingssoort($this->coachview))->hydrate($coachViewCourseTemplate);
+        return (new Opleidingsonderdeel($this->coachview))->hydrate($coachViewCourseTemplate);
     }
 
     public function getId(): ?string
@@ -199,10 +199,10 @@ class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
         return $this->getById($this->getId());
     }
 
-    public function getByCode(string $code): ?Opleidingssoort
+    public function getByCode(string $code): ?Opleidingsonderdeel
     {
         $params = $this->makeParams(['where' => 'code='.$code]);
-        $data = $this->coachview->getData('/api/v1/Opleidingssoorten', $params);
+        $data = $this->coachview->getData('/api/v1/Opleidingsonderdelen', $params);
 
         foreach ($data as $coachViewCourseTemplate) {
             return $this->hydrate($coachViewCourseTemplate);
@@ -211,9 +211,9 @@ class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
         return null;
     }
 
-    public function getById(string $id): ?Opleidingssoort
+    public function getById(string $id): ?Opleidingsonderdeel
     {
-        $data = $this->coachview->getData('/api/v1/Opleidingssoorten/'.$id);
+        $data = $this->coachview->getData('/api/v1/Opleidingsonderdelen/'.$id);
         return $this->hydrate($data);
     }
 
@@ -222,7 +222,7 @@ class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
      */
     public function getFreeFields(): array
     {
-        return $this->traitGetFreeFields('/api/v1/Opleidingssoorten/Vrijevelden');
+        return $this->traitGetFreeFields('/api/v1/Opleidingsonderdelen/Vrijevelden');
     }
 
     public function getCategorieen(): array

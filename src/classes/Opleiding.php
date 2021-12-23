@@ -3,9 +3,11 @@
 namespace Diezit\CoachviewConnector\Classes;
 
 use Carbon\Carbon;
+use Diezit\CoachviewConnector\Interfaces\OpleidingInterface;
+use Diezit\CoachviewConnector\Interfaces\PersoonInterface;
 use Illuminate\Support\Collection;
 
-class Opleiding extends CoachviewData
+class Opleiding extends CoachviewData implements OpleidingInterface
 {
     /** @var string */
     protected $id;
@@ -157,7 +159,7 @@ class Opleiding extends CoachviewData
         return $this;
     }
 
-    public function getContactPersoon(): Persoon
+    public function getContactPersoon(): ?PersoonInterface
     {
         return $this->contactPersoon;
     }

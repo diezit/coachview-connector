@@ -6,6 +6,7 @@ use Cache;
 use Diezit\CoachviewConnector\Classes\Opleiding;
 use Diezit\CoachviewConnector\Classes\CourseComponent;
 use Diezit\CoachviewConnector\Classes\CourseComponentTeacher;
+use Diezit\CoachviewConnector\Classes\Opleidingsonderdeel;
 use Diezit\CoachviewConnector\Classes\Opleidingssoort;
 use Diezit\CoachviewConnector\Classes\Persoon;
 use Diezit\CoachviewConnector\Classes\Teacher;
@@ -146,6 +147,11 @@ class Coachview
     public function opleidingssoort(): Opleidingssoort
     {
         return new Opleidingssoort($this);
+    }
+
+    public function opleidingsonderdeel(): Opleidingsonderdeel
+    {
+        return new Opleidingsonderdeel($this);
     }
 
     public function courseComponent(): CourseComponent

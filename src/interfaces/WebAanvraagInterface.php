@@ -4,7 +4,6 @@ namespace Diezit\CoachviewConnector\Interfaces;
 
 interface WebAanvraagInterface
 {
-
     public function getReferentieNrKlant();
 
     public function getOpmerking();
@@ -30,6 +29,4 @@ interface WebAanvraagInterface
     public function getDeelnemers();
 
     public function getOpleidingen();
-
-
 }
