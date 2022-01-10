@@ -232,7 +232,7 @@ class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
         $coachViewData = $coachView->getData('/api/v1/Opleidingssoortcategorieen', $params);
         $categories = [];
         foreach ($coachViewData as $categoryField) {
-            $categories[] = $categoryField->naam;
+            $categories[$categoryField->opleidingssoortcategoriegroep->naam] = $categoryField->naam;
         }
         return $categories;
     }

@@ -12,6 +12,7 @@ use Diezit\CoachviewConnector\Classes\Persoon;
 use Diezit\CoachviewConnector\Classes\Teacher;
 use Diezit\CoachviewConnector\Classes\WebAanvraag;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 
@@ -77,7 +78,7 @@ class Coachview
                     ]
                 ]
             );
-        } catch (RequestException $exception) {
+        } catch (RequestException | ClientException $exception) {
             // try once more if code is 401 (unauthorized)
             if ($exception->getCode() === 401 && !$isRetrying) {
                 $this->refreshAccessToken();
