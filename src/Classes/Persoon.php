@@ -36,15 +36,23 @@ class Persoon extends CoachviewData implements PersoonInterface
         return collect($response);
     }
 
-    public function findByEmail($email): ?Persoon
+    public function findByEmail($email): Collection
     {
         $params = $this->makeParams(['where' => 'email1='.$email]);
         $data = $this->coachview->getData('/api/v1/Personen', $params);
 
+        $response = [];
         foreach ($data as $coachViewPersoon) {
-            return Persoon::fromCoachViewData($this->coachview, $coachViewPersoon);
+            $response[] = Persoon::fromCoachViewData($this->coachview, $coachViewPersoon);
         }
-        return null;
+
+        return collect($response);
+    }
+
+    public function getById(string $id): ?Persoon
+    {
+        $data = $this->coachview->getData('/api/v1/Personen/'.$id);
+        return $this->fromCoachViewData($this->coachview, $data);
     }
 
     public static function fromCoachViewData($coachview, $coachViewPersoon): Persoon
