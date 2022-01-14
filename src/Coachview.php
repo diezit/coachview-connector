@@ -126,6 +126,8 @@ class Coachview
                             'Docenten.Lezen',
                             'Webaanvragen.Schrijven',
                             'Personen.Lezen',
+                            'Personen.Schrijven',
+                            'Persoonscategorieen.Lezen',
                         ]),
                     ]
                 ]

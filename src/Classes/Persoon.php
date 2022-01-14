@@ -21,6 +21,7 @@ class Persoon extends CoachviewData implements PersoonInterface
     protected $telefoonNummer;
     protected $geslacht;
     protected $geboorteDatum;
+    protected $inactief;
 
     public function all($offset = null, $limit = null): Collection
     {
@@ -35,6 +36,17 @@ class Persoon extends CoachviewData implements PersoonInterface
         return collect($response);
     }
 
+    public function findByEmail($email): ?Persoon
+    {
+        $params = $this->makeParams(['where' => 'email1='.$email]);
+        $data = $this->coachview->getData('/api/v1/Personen', $params);
+
+        foreach ($data as $coachViewPersoon) {
+            return Persoon::fromCoachViewData($this->coachview, $coachViewPersoon);
+        }
+        return null;
+    }
+
     public static function fromCoachViewData($coachview, $coachViewPersoon): Persoon
     {
         return (new Persoon($coachview))
@@ -45,6 +57,7 @@ class Persoon extends CoachviewData implements PersoonInterface
             ->setTussenvoegsels($coachViewPersoon->tussenvoegsels)
             ->setAchternaam($coachViewPersoon->achternaam)
             ->setAchterTitel($coachViewPersoon->achterTitel)
+            ->setInactief($coachViewPersoon->inactief)
             ->setAdres($coachViewPersoon->adres ? Adres::fromCoachViewData($coachview, $coachViewPersoon->adres) : null)
             ->setFactuurAdres(
                 $coachViewPersoon->factuurAdres ? Adres::fromCoachViewData(
@@ -56,6 +69,21 @@ class Persoon extends CoachviewData implements PersoonInterface
             ->setTelefoonNummer($coachViewPersoon->tel1)
             ->setGeslacht($coachViewPersoon->geslacht)
             ->setGeboorteDatum($coachViewPersoon->geboortedatum);
+    }
+
+    public function submit(PersoonInterface $persoon)
+    {
+        $postData = [
+            'titel' => $persoon->getTitel(),
+            'voorletters' => $persoon->getVoorletters(),
+            'voornaam' => $persoon->getVoornaam(),
+            'tussenvoegsels' => $persoon->getTussenvoegsels(),
+            'achternaam' => $persoon->getAchternaam(),
+            'email1' => $persoon->getEmailAdres(),
+            'tel1' => $persoon->getTelefoonNummer(),
+        ];
+
+        return $this->coachview->doRequest('/api/v1/Personen', 'POST', $postData);
     }
 
     public function getId(): ?string
@@ -200,4 +228,29 @@ class Persoon extends CoachviewData implements PersoonInterface
         $this->geboorteDatum = $geboorteDatum;
         return $this;
     }
+
+    public function getCategorieen(): array
+    {
+        $coachView = $this->getCoachview();
+        $params = $this->makeParams(['PersoonId' => $this->getId()]);
+        $coachViewData = $coachView->getData('/api/v1/Persoonscategorieen', $params);
+        $categories = [];
+        foreach ($coachViewData as $categoryField) {
+            $categories[] = $categoryField->naam;
+        }
+        return $categories;
+    }
+
+    public function getInactief(): bool
+    {
+        return $this->inactief;
+    }
+
+    public function setInactief(?bool $inactief): self
+    {
+        $this->inactief = (bool)$inactief;
+        return $this;
+    }
+
+
 }
