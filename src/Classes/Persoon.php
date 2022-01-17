@@ -21,6 +21,7 @@ class Persoon extends CoachviewData implements PersoonInterface
     protected $telefoonNummer;
     protected $geslacht;
     protected $geboorteDatum;
+    protected $geboortePlaats;
     protected $inactief;
 
     public function all($offset = null, $limit = null): Collection
@@ -76,6 +77,7 @@ class Persoon extends CoachviewData implements PersoonInterface
             ->setEmailAdres($coachViewPersoon->email1)
             ->setTelefoonNummer($coachViewPersoon->tel1)
             ->setGeslacht($coachViewPersoon->geslacht)
+            ->setGeboortePlaats($coachViewPersoon->geboorteplaats)
             ->setGeboorteDatum($coachViewPersoon->geboortedatum);
     }
 
@@ -234,6 +236,17 @@ class Persoon extends CoachviewData implements PersoonInterface
     public function setGeboorteDatum(?string $geboorteDatum): self
     {
         $this->geboorteDatum = $geboorteDatum;
+        return $this;
+    }
+
+    public function getGeboortePlaats(): ?string
+    {
+        return $this->geboortePlaats;
+    }
+
+    public function setGeboortePlaats(?string $geboortePlaats): self
+    {
+        $this->geboortePlaats = $geboortePlaats;
         return $this;
     }
 
