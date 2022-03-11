@@ -128,6 +128,7 @@ class WebAanvraag extends CoachviewData implements WebAanvraagInterface
             'aanvraagIsOrder' => $webAanvraag->getAanvraagIsOrder(),
             'opleidingen' => $webAanvraag->getOpleidingen(),
             'contactpersoon' => $webAanvraag->getContactpersoon()->toArray(),
+            'bedrijf' => $webAanvraag->getBedrijf() ? $webAanvraag->getBedrijf()->toArray() : null,
         ];
 
         return $this->coachview->doRequest('/api/v1/Webaanvragen', 'POST', $postData);
