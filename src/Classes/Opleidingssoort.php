@@ -36,7 +36,7 @@ class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
      */
     public function all(int $offset = null, int $limit = null): Collection
     {
-        $params = $this->makeParams(['skip' => $offset, 'take' => $limit]);
+        $params = $this->makeParams(['skip' => $offset, 'take' => $limit, 'InclusiefDirecteRelaties' => 'true', 'InclusiefExtraVelden' => 'true']);
         $data = $this->coachview->getData('/api/v1/Opleidingssoorten', $params);
 
         $response = [];
@@ -228,7 +228,7 @@ class Opleidingssoort extends CoachviewData implements OpleidingssoortInterface
     public function getCategorieen(): array
     {
         $coachView = $this->getCoachview();
-        $params = $this->makeParams(['OpleidingssoortId' => $this->getId()]);
+        $params = $this->makeParams(['OpleidingssoortId' => $this->getId(), 'InclusiefDirecteRelaties' => 'true', 'InclusiefExtraVelden' => 'true']);
         $coachViewData = $coachView->getData('/api/v1/Opleidingssoortcategorieen', $params);
         $categories = [];
         foreach ($coachViewData as $categoryField) {

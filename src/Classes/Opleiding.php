@@ -33,7 +33,7 @@ class Opleiding extends CoachviewData implements OpleidingInterface
 
     public function all(int $offset = null, int $limit = null): Collection
     {
-        $params = $this->makeParams(['skip' => $offset, 'take' => $limit]);
+        $params = $this->makeParams(['skip' => $offset, 'take' => $limit, 'InclusiefDirecteRelaties' => 'true', 'InclusiefExtraVelden' => 'true']);
         $data = $this->coachview->getData('/api/v1/Opleidingen', $params);
 
         $response = [];
